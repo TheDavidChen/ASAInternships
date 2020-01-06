@@ -99,5 +99,5 @@ Cleaned_posting <-
 ```{r}
 # Export the data
 write.csv(Cleaned_posting, 'ASA_Postings.csv')
-saveRDS(Cleaned_posting, file = "ASA_Postings.rds")
+#saveRDS(Cleaned_posting, file = "ASA_Postings.rds")
 ```
