@@ -74,8 +74,6 @@ Posting_info <-
   separate(positions, c('positions', 'degree'), 'Type of Student:|Student:') %>%
   separate(degree, c('degree', 'deadline'), 'Deadline:|Deadline for Applying:') %>%
   cbind(Company_names, .)
-
-
 ```
 ```{r}
 # There were a few posting that did not contain number of positions. Clean those.
