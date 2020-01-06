@@ -1,0 +1,103 @@
+---
+title: "ASA Internship Scraping"
+author: "David Chen"
+date: "01/06/2020"
+output: html_document
+---
+### Last updated: January 6th, 2020
+
+```{r setup, include=FALSE}
+# Clean up R environment
+rm(list = ls())
+
+# Load in packages
+require(rvest)
+require(tidyverse)
+require(reshape2)
+```
+
+```{r}
+ASA_link <- 'https://stattrak.amstat.org/2019/12/01/2020-internship-listings/'
+ASA <- read_html(ASA_link)
+```
+
+
+```{r}
+# Scrape the company names
+span_nodes <- html_nodes(ASA, 'span') 
+
+Company_names_raw <-
+  span_nodes %>%
+  html_text() %>%
+  as.data.frame()
+
+# Mark where the first company name is
+start_index <- 
+  which(Company_names_raw$. == 'Posted in: Feature, Job Tr@k') + 1
+
+# End of company names
+end_index <- 
+  which(Company_names_raw$. == 'Your email address will not be published.') - 1
+
+# Remove extraneous rows
+Company_names <- 
+  Company_names_raw[c(start_index:end_index), ] %>%
+  as.data.frame()
+
+# Rename the column to 'Company' for clarity
+names(Company_names)[1] <- 'Company'
+
+```
+
+
+
+```{r}
+# Scrape remaining information
+p_nodes <- html_nodes(ASA, 'p') 
+
+text_raw <-
+  p_nodes %>%
+  html_text() %>%
+  as.data.frame()
+
+names(text_raw)[1] <- 'text'
+
+# Remove all the extraneous text
+text_relevant <- 
+  text_raw[grep('Type of Student:|Deadline:', text_raw$text), ] %>%
+  as.data.frame() 
+
+# Create columns based on specified terms
+Posting_info <- 
+  text_relevant %>%
+  separate(1, c('location', 'positions'), 'Number of Positions:') %>%
+  separate(positions, c('positions', 'degree'), 'Type of Student:|Student:') %>%
+  separate(degree, c('degree', 'deadline'), 'Deadline:|Deadline for Applying:') %>%
+  cbind(Company_names, .)
+
+
+```
+```{r}
+# There were a few posting that did not contain number of positions. Clean those.
+# The separate order is deadline then degree since google did not specify degree
+Outliers <-
+  Posting_info %>%
+  separate(location, c('location', 'deadline'), 'Deadline:|Deadline for Applying:') %>%
+  separate(location, c('location', 'degree'), 'Type of Student:|Student:') %>%
+  select(Company, deadline, degree) %>%
+  drop_na(cols = 'deadline')
+
+# Join the postings together
+Cleaned_posting <- 
+  left_join(Posting_info, Outliers, by = 'Company') %>%
+  mutate(degree = coalesce(degree.x, degree.y), 
+         deadline = coalesce(deadline.x, deadline.y)) %>%
+  select(Company, location, degree, positions, deadline)
+```
+
+
+```{r}
+# Export the data
+write.csv(Cleaned_posting, 'ASA_Postings.csv')
+saveRDS(Cleaned_posting, file = "ASA_Postings.rds")
+```
