@@ -82,14 +82,15 @@ Outliers <-
   Posting_info %>%
   separate(location, c('location', 'deadline'), 'Deadline:|Deadline for Applying:') %>%
   separate(location, c('location', 'degree'), 'Type of Student:|Student:') %>%
-  select(Company, deadline, degree) %>%
+  select(Company, location, deadline, degree) %>%
   drop_na(cols = 'deadline')
 
 # Join the postings together
 Cleaned_posting <- 
   left_join(Posting_info, Outliers, by = 'Company') %>%
   mutate(degree = coalesce(degree.x, degree.y), 
-         deadline = coalesce(deadline.x, deadline.y)) %>%
+         deadline = coalesce(deadline.x, deadline.y),
+         location = coalesce(location.y, location.x)) %>%
   select(Company, location, degree, positions, deadline)
 ```
 
