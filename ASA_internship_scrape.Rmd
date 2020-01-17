@@ -4,7 +4,7 @@ author: "David Chen"
 date: "01/06/2020"
 output: html_document
 ---
-### Last updated: January 6th, 2020
+### Last updated: January 16th, 2020
 
 ```{r setup, include=FALSE}
 # Clean up R environment
@@ -97,6 +97,6 @@ Cleaned_posting <-
 
 ```{r}
 # Export the data
-write.csv(Cleaned_posting, 'ASA_Postings.csv')
+#write.csv(Cleaned_posting, 'ASA_Postings.csv')
 #saveRDS(Cleaned_posting, file = "ASA_Postings.rds")
 ```
