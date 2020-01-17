@@ -1,7 +1,7 @@
 # ASA Internships
 Scraping the American Statistical Association's 2020 Internship Posting. 
 
-## Last updated: January 6th, 2019
+## Last updated: January 16th, 2019
 
 Data source: https://stattrak.amstat.org/2019/12/01/2020-internship-listings/
 
